@@ -1,0 +1,22 @@
+package main
+
+import (
+	"log"
+	"net/http"
+)
+
+func main() {
+	ConnectDB()
+	InitTables()
+
+	http.HandleFunc("/messages", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			postMessage(w, r)
+		} else {
+			getMessages(w, r)
+		}
+	})
+
+	log.Println("Server running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
