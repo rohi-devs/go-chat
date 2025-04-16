@@ -59,15 +59,19 @@ func handleCORS(next http.Handler) http.Handler {
 
 // Get all messages
 func getMessages(w http.ResponseWriter, r *http.Request) {
+	// Default limit
+	limit := 10
+
 	var messages []Message
-	if err := db.Find(&messages).Error; err != nil {
+	if err := db.Order("created_at desc").Limit(limit).Find(&messages).Error; err != nil {
 		http.Error(w, "Failed to fetch messages", http.StatusInternalServerError)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(messages)
 }
+
 
 // Post a new message
 func postMessage(w http.ResponseWriter, r *http.Request) {
