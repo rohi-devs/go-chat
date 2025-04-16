@@ -62,7 +62,7 @@ func getMessages(w http.ResponseWriter, r *http.Request) {
 	limit := 10 // Default limit
 
 	var messages []Message
-	if err := db.Order("created_at DESC").Limit(limit).Find(&messages).Error; err != nil {
+	if err := db.Order("created_at").Limit(limit).Find(&messages).Error; err != nil {
 		http.Error(w, "Failed to fetch messages", http.StatusInternalServerError)
 		return
 	}
