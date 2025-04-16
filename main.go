@@ -59,17 +59,23 @@ func handleCORS(next http.Handler) http.Handler {
 
 // Get all messages
 func getMessages(w http.ResponseWriter, r *http.Request) {
-	limit := 10 // Default limit
-
 	var messages []Message
-	if err := db.Order("created_at").Limit(limit).Find(&messages).Error; err != nil {
+
+	// Step 1: Get the last 10 messages in descending order
+	if err := db.Order("created_at desc").Limit(10).Find(&messages).Error; err != nil {
 		http.Error(w, "Failed to fetch messages", http.StatusInternalServerError)
 		return
+	}
+
+	// Step 2: Reverse the slice to show in ascending order
+	for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+		messages[i], messages[j] = messages[j], messages[i]
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(messages)
 }
+
 
 
 
